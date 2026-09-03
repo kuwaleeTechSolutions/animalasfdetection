@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>Assam Livestock Biosecurity &amp; Disease Contact-Tracing Platform</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%F0%9F%90%96</text></svg>" />
+
+<!-- ==============================================================================
+  [DECIDE] Frontend stack deviation -- documented in full in README.md
+  "Tech Stack Decisions & Sandbox Constraints".
+
+  The spec calls for React + TypeScript + Vite + Tailwind + react-leaflet (OSM tiles).
+  This pilot was built inside a fully air-gapped sandbox: no npm registry access AND
+  no CDN access (unpkg, cdnjs, OSM tile servers all return 403) AND no bundler
+  (webpack/esbuild/vite/rollup) available locally. A real Vite+React build could not
+  be verified end-to-end under these conditions.
+
+  Rather than ship unverified/untested code, this pilot's web frontend is dependency-
+  free vanilla JavaScript (ES modules, native browser APIs only) with:
+    - a tiny hash-based client-side router (src/router.js)
+    - a hand-rolled component model using template-literal HTML + event delegation
+      (src/lib/dom.js) -- structurally equivalent to React function components,
+      making a later migration to real React+TSX a mechanical, low-risk lift
+    - a custom lightweight SVG-based GIS map (src/lib/map.js) using an equirectangular
+      lat/lng projection over Assam's bounding box, since react-leaflet + OpenStreetMap
+      tiles require live internet access this sandbox does not have. Swapping this for
+      react-leaflet + OSM tiles in an internet-connected deployment is a drop-in
+      replacement of ONE component (the map is already isolated behind a single
+      renderMap() function).
+    - hand-written CSS providing a Tailwind-like utility class set (styles.css)
+
+  This keeps the ENTIRE pilot runnable with nothing more than `node` + a browser --
+  no `npm install`, no CDN, no internet required -- while preserving the same
+  component structure, route map, and screens specified in §7 of the brief.
+=============================================================================== -->
+
+<link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div id="root">
+    <div class="boot-loader">Loading Assam Livestock Biosecurity Platform&hellip;</div>
+  </div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

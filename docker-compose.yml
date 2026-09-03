@@ -1,0 +1,53 @@
+# =====================================================================================
+# Assam Livestock Biosecurity & Disease Contact-Tracing Platform -- docker-compose
+#
+# [DECIDE] Pilot topology: ONE `app` service (Node.js backend + statically-served
+# frontend, see Dockerfile) backed by an embedded SQLite file on a named volume --
+# NOT a separate database container. This directly reflects the pilot's tech-stack
+# decision (see README.md "Tech Stack Decisions & Sandbox Constraints"): the spec's
+# target production stack is PostgreSQL + PostGIS, but that requires a package
+# registry / container registry pull this build sandbox did not have access to.
+#
+# A ready-to-uncomment `postgres` service (with the postgis/postgis image) is
+# included below for when this pilot is promoted to a Postgres-backed deployment --
+# at that point, only backend/src/db/connection.mts and the repository files need a
+# Postgres driver swap; the route/service layer above them is unchanged.
+#
+# Run with: docker compose up --build
+# =====================================================================================
+version: "3.9"
+
+services:
+  app:
+    build: .
+    ports:
+      - "4000:4000"
+    environment:
+      - PORT=4000
+      - DB_PATH=/app/data/assam_biosecurity.db
+      - TOKEN_SECRET=change-me-in-production
+    volumes:
+      - biosecurity_data:/app/data
+    restart: unless-stopped
+
+  # ------------------------------------------------------------------------------
+  # [FUTURE / PRODUCTION] Uncomment when migrating from the pilot's embedded SQLite
+  # to PostgreSQL + PostGIS. Update backend/src/db/connection.mts and the
+  # repositories/*.mts files to use a `pg` client against this service instead of
+  # node:sqlite -- the geo queries are already isolated in src/lib/geo.mts so this
+  # is a repository-implementation swap, not a redesign (see README).
+  # ------------------------------------------------------------------------------
+  # postgres:
+  #   image: postgis/postgis:16-3.4
+  #   environment:
+  #     - POSTGRES_DB=assam_biosecurity
+  #     - POSTGRES_USER=assam_biosecurity
+  #     - POSTGRES_PASSWORD=change-me-in-production
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - biosecurity_pg_data:/var/lib/postgresql/data
+
+volumes:
+  biosecurity_data: {}
+  # biosecurity_pg_data: {}

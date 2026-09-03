@@ -1,0 +1,17 @@
+{
+  "name": "assam-livestock-biosecurity-platform",
+  "version": "0.1.0-pilot",
+  "private": true,
+  "description": "Assam Livestock Biosecurity & Disease Contact-Tracing Platform -- Phase 1 pilot (ASF).",
+  "type": "module",
+  "scripts": {
+    "seed": "node backend/scripts/seed.mts",
+    "start": "node backend/src/server.mts",
+    "dev": "node backend/src/server.mts",
+    "test": "node backend/tests/run-all.mts",
+    "smoke": "node frontend/test-harness/smoke.mjs http://localhost:4000"
+  },
+  "engines": {
+    "node": ">=22.5.0"
+  }
+}
